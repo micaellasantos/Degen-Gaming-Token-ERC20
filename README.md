@@ -1,8 +1,8 @@
-# Create and Mint Token
-Creating and minting a token involves deploying a smart contract on a blockchain platform like Ethereum.
+# Degen Gaming Token
+A solidity code that defines a smart contract for a token called DGT which is an ERC20 token witch additional functionality for managing and redeeming in-game items. It also includes ownership control, allowing only the owner to perform certain actions.
 
 ## Description
-Creating and minting tokens involves gas fees (transaction fees) and requires some familiarity with blockchain development and smart contracts. 
+Creating tokens involves gas fees (transaction fees) and requires some familiarity with blockchain development and smart contracts. 
 
 ## Getting Started
 
