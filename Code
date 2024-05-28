@@ -38,29 +38,30 @@ contract DegenGamingToken is ERC20, Ownable {
         return true;
     }
 
-    function redeem(uint256 amount) public {
+    function redeem(uint256 amount, address redeemAddress) public {
+        require(redeemAddress != address(0), "Invalid redeem address");
+        require(amount > 0, "Invalid redeem amount");
+
         _burn(msg.sender, amount);
+        transferTokens(redeemAddress, amount);
+
+        emit ItemRedeemed(redeemAddress, 0, amount);
     }
 
     function addItem(string memory name, uint256 price, uint256 quantity) public onlyOwner {
-        uint256 itemId = nextItemId; // Use nextItemId for the new item
+        uint256 itemId = nextItemId; 
         items.push(Item(itemId, name, price, quantity));
         itemIdToIndex[itemId] = items.length - 1;
         emit ItemAdded(itemId, name, price, quantity);
-        nextItemId++; // Increment nextItemId for the next item
+        nextItemId++;
     }
 
     function redeemItem(uint256 itemId) public {
         uint256 index = itemIdToIndex[itemId];
         require(index < items.length, "Item does not exist");
-        emit Debug("Index", index);
 
         Item storage item = items[index];
-        emit Debug("Quantity", item.quantity);
         require(item.quantity > 0, "Item out of stock");
-
-        emit Debug("Balance", balanceOf(msg.sender));
-        emit Debug("Item Price", item.price);
         require(balanceOf(msg.sender) >= item.price, "Insufficient token balance");
 
         _burn(msg.sender, item.price);
