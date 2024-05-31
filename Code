@@ -17,9 +17,11 @@ contract DegenGamingToken is ERC20, Ownable {
     mapping(uint256 => uint256) private itemIdToIndex;
     uint256 private nextItemId;
 
+    mapping(address => mapping(uint256 => bool)) private redeemedItems;
+    mapping(uint256 => address) private itemOwners;
+
     event ItemAdded(uint256 indexed itemId, string name, uint256 price, uint256 quantity);
     event ItemRedeemed(address indexed user, uint256 indexed itemId, uint256 price);
-    event Debug(string message, uint256 value);
 
     constructor(address owner) ERC20("DegenGamingToken", "DGT") Ownable(owner) {
         nextItemId = 1; 
@@ -63,9 +65,13 @@ contract DegenGamingToken is ERC20, Ownable {
         Item storage item = items[index];
         require(item.quantity > 0, "Item out of stock");
         require(balanceOf(msg.sender) >= item.price, "Insufficient token balance");
+        require(!redeemedItems[msg.sender][itemId], "Item already redeemed by this address");
 
         _burn(msg.sender, item.price);
         item.quantity -= 1;
+
+        redeemedItems[msg.sender][itemId] = true;
+        itemOwners[itemId] = msg.sender;
 
         emit ItemRedeemed(msg.sender, itemId, item.price);
     }
@@ -79,5 +85,13 @@ contract DegenGamingToken is ERC20, Ownable {
 
     function getItemCount() public view returns (uint256) {
         return items.length;
+    }
+
+    function hasRedeemedItem(address user, uint256 itemId) public view returns (bool) {
+        return redeemedItems[user][itemId];
+    }
+
+    function getItemOwner(uint256 itemId) public view returns (address) {
+        return itemOwners[itemId];
     }
 }
